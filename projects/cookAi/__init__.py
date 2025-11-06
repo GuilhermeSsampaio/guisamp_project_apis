@@ -1,0 +1,1 @@
+# CookAi Project - AI-powered recipe management and discovery

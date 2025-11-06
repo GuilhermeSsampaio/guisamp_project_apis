@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, HTTPException
-from db.config_db import SessionDep
-from models import user
+from ...db.config_db import SessionDep
+from ..models import user
 from sqlmodel import select
 
 router = APIRouter(prefix="/users")

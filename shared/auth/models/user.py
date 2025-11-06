@@ -1,14 +1,23 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
+from typing import Optional, TYPE_CHECKING
 import bcrypt
 
+if TYPE_CHECKING:
+    from projects.cookAi.models.recipe import Recipe
+
 class UserDB(SQLModel, table=True):
+    __tablename__ = "user"
+    
     id: int | None = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True)
     password: str
     email: EmailStr = Field(index=True, unique=True)
     created_at: datetime = Field(default_factory=datetime.now)
+    
+    # Relacionamentos
+    recipes: list["Recipe"] = Relationship(back_populates="owner")
     
 class UserLogin(BaseModel):
     email:str

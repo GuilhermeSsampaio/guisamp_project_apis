@@ -2,9 +2,9 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import HTMLResponse
 from sqlmodel import select
-from padroes import encontrar_acordes, limpar_letra, montar_cifra
-from models.MusicalComposition import MusicalComposition, MusicalCompositionCreate, MusicalCompositionRead
-from db.config_db import SessionDep
+from shared.db.config_db import SessionDep
+from ..utils.padroes import encontrar_acordes, limpar_letra, montar_cifra
+from ..models.MusicalComposition import MusicalComposition, MusicalCompositionCreate, MusicalCompositionRead
 
 router = APIRouter(prefix="/musical_compositions")
 
