@@ -4,16 +4,9 @@ from sqlmodel import SQLModel, create_engine, Session
 from typing import Annotated
 from fastapi import Depends
 import os
-from pathlib import Path
 
-# Carrega o .env da raiz do projeto
-root_dir = Path(__file__).parent.parent.parent
-env_path = root_dir / ".env"
-
-if not env_path.exists():
-    raise FileNotFoundError(f"Arquivo .env não encontrado em: {env_path}")
-
-load_dotenv(env_path)
+# Carrega o .env automaticamente (busca no diretório atual e pais)
+load_dotenv()
 
 # Validação das variáveis de ambiente
 DB_USER = os.environ.get("DB_USER")
