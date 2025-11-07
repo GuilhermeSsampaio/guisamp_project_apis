@@ -1,20 +1,51 @@
-from sqlmodel import SQLModel, Session, create_engine
+from dotenv import load_dotenv
+from urllib.parse import quote_plus
+from sqlmodel import SQLModel, create_engine, Session
 from typing import Annotated
 from fastapi import Depends
+import os
+from pathlib import Path
 
-# session -> conexão ativa com o banco, é um objeto
+# Carrega o .env da raiz do projeto
+root_dir = Path(__file__).parent.parent.parent
+env_path = root_dir / ".env"
 
-# Nome do arquivo do banco de dados SQLite
-sqlite_file_name = "database.db"
-# URL de conexão no formato aceito pelo SQLModel/SQLAlchemy
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+if not env_path.exists():
+    raise FileNotFoundError(f"Arquivo .env não encontrado em: {env_path}")
 
-# Argumentos extras para a conexão
-# 'check_same_thread': False permite acesso ao banco por múltiplas threads (útil em aplicações web)
-connect_args = {"check_same_thread": False}
+load_dotenv(env_path)
 
-# Cria o objeto engine, responsável pela comunicação com o banco de dados
-engine = create_engine(sqlite_url, connect_args=connect_args)
+# Validação das variáveis de ambiente
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_HOST = os.environ.get("DB_HOST")
+DB_PORT = os.environ.get("DB_PORT", "5432")  # Porta padrão do PostgreSQL
+DB_NAME = os.environ.get("DB_NAME")
+
+# Validação de variáveis obrigatórias
+required_vars = {
+    "DB_USER": DB_USER,
+    "DB_PASSWORD": DB_PASSWORD,
+    "DB_HOST": DB_HOST,
+    "DB_NAME": DB_NAME
+}
+
+missing = [k for k, v in required_vars.items() if not v]
+if missing:
+    raise EnvironmentError(f"Variáveis de ambiente obrigatórias não encontradas: {', '.join(missing)}")
+
+print(f"Conectando ao banco de dados em {DB_HOST}:{DB_PORT}/{DB_NAME} como usuário {DB_USER}")
+
+# Construindo a URL de conexão de forma segura COM A PORTA
+DATABASE_URL = f"postgresql://{quote_plus(DB_USER)}:{quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+# Criando o engine com suporte a UTF-8
+engine = create_engine(
+    DATABASE_URL,
+    echo=True,
+    connect_args={"client_encoding": "utf8"},
+    pool_pre_ping=True  # Verifica se a conexão está ativa antes de usar
+)
 
 def create_db_and_tables():
     """
@@ -22,6 +53,11 @@ def create_db_and_tables():
     Deve ser chamada uma vez ao iniciar o projeto ou ao atualizar modelos.
     """
     SQLModel.metadata.create_all(engine)
+
+# Mantém compatibilidade com código antigo
+def init_db():
+    """Alias para create_db_and_tables()"""
+    create_db_and_tables()
 
 def get_session():
     """
@@ -33,3 +69,11 @@ def get_session():
 
 # Dependência do FastAPI para injetar a sessão do banco nos endpoints
 SessionDep = Annotated[Session, Depends(get_session)]
+
+# Modo de teste (descomentado caso necessário)
+# if os.getenv("ENV") == "test":
+#     print("\n\n ambiente: ", os.getenv("ENV"), "\n\n")
+#     print("Modo de teste ativado: o banco de dados será reiniciado a cada inicialização.")
+#     def create_db_and_tables():
+#         SQLModel.metadata.drop_all(engine)  # Exclui todas as tabelas
+#         SQLModel.metadata.create_all(engine)  # Recria todas as tabelas
