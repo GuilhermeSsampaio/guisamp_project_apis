@@ -14,6 +14,7 @@ sys.path.insert(0, str(backend_dir))
 from shared.auth.models.user import UserDB
 from projects.make_music.models.MusicalComposition import MusicalComposition
 from projects.cookAi.models.recipe import Recipe
+# from projects.mylove4u.models.diary import DiaryDB, DiaryUserLink
 
 # Shared/Auth routes
 from shared.auth.routes.users import router as users_router

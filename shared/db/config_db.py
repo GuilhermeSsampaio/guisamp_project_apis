@@ -9,11 +9,11 @@ import os
 load_dotenv()
 
 # Validação das variáveis de ambiente
-DB_USER = os.environ.get("DB_USER")
-DB_PASSWORD = os.environ.get("DB_PASSWORD")
-DB_HOST = os.environ.get("DB_HOST")
+DB_USER = os.environ.get("DB_USER", "postgres")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "root")
+DB_HOST = os.environ.get("DB_HOST", "localhost")
 DB_PORT = os.environ.get("DB_PORT", "5432")  # Porta padrão do PostgreSQL
-DB_NAME = os.environ.get("DB_NAME")
+DB_NAME = os.environ.get("DB_NAME", "api_db")
 
 # Validação de variáveis obrigatórias
 required_vars = {
