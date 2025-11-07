@@ -158,7 +158,6 @@ pyttsx3==2.98
 pytubefix==8.13.1
 pytweening==1.2.0
 pytz==2025.2
-pywin32==308
 PyYAML==6.0.2
 pyzmq==26.4.0
 referencing==0.36.2
